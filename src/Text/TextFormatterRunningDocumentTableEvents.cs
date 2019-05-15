@@ -62,8 +62,8 @@ namespace BimFormatter.Text
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            //try
-            //{
+            try
+            {
                 var documentInfo = _runningDocumentTable.GetDocumentInfo(docCookie);
                 var extension = Path.GetExtension(documentInfo.Moniker);
 
@@ -86,8 +86,8 @@ namespace BimFormatter.Text
                         break;
                     }
                 }
-            //}
-            //catch { /* Suppress exception */ }
+            }
+            catch { /* Suppress exception */ }
 
             return VSConstants.S_OK;
         }
