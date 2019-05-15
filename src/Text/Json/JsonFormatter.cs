@@ -13,7 +13,7 @@ namespace BimFormatter.Text.Json
 
         public JsonFormatter(IEnumerable<JsonSortArrayOptions> sortArrayOptions)
         {
-            _sortArrayOptions = sortArrayOptions.ToDictionary(aso => aso.Path);
+            _sortArrayOptions = sortArrayOptions.ToDictionary(jsao => jsao.Path);
             _registeredPaths = new HashSet<string>(_sortArrayOptions.Keys.SelectMany(ExtractPaths));
         }
 
