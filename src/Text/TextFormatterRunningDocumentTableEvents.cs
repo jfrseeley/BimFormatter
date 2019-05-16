@@ -35,6 +35,37 @@ namespace BimFormatter.Text
 
         public int OnAfterSave(uint docCookie)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            try
+            {
+                var documentInfo = _runningDocumentTable.GetDocumentInfo(docCookie);
+                var extension = Path.GetExtension(documentInfo.Moniker);
+
+                if (_textFormatters.TryGetValue(extension, out ITextFormatter textFormatter))
+                {
+                    foreach (Document document in _dte.Documents)
+                    {
+                        if (document.FullName != documentInfo.Moniker)
+                        {
+                            continue;
+                        }
+
+                        /* textDocument is null when using Visual Studio's bim designer. */
+                        var textDocument = document.Object("TextDocument") as TextDocument;
+                        if (textDocument == null)
+                        {
+                            var input = File.ReadAllText(document.FullName);
+                            var output = textFormatter.Format(input);
+
+                            File.WriteAllText(document.FullName, output);
+                        }
+
+                        break;
+                    }
+                }
+            }
+            catch { /* Suppress exception */ }
             return VSConstants.S_OK;
         }
 
@@ -76,13 +107,18 @@ namespace BimFormatter.Text
                             continue;
                         }
 
+                        /* textDocument is not null when editing the raw bim file. */
                         var textDocument = document.Object("TextDocument") as TextDocument;
-                        var startPoint = textDocument.StartPoint.CreateEditPoint();
+                        if (textDocument != null)
+                        {
+                            var startPoint = textDocument.StartPoint.CreateEditPoint();
 
-                        var input = startPoint.GetText(textDocument.EndPoint);
-                        var output = textFormatter.Format(input);
+                            var input = startPoint.GetText(textDocument.EndPoint);
+                            var output = textFormatter.Format(input);
 
-                        startPoint.ReplaceText(textDocument.EndPoint, output, -1);
+                            startPoint.ReplaceText(textDocument.EndPoint, output, -1);
+                        }
+
                         break;
                     }
                 }
