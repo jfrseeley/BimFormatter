@@ -30,7 +30,7 @@ namespace BimFormatter
     /// </para>
     /// </remarks>
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
-    [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)] // Info on this package for Help/About
+    [InstalledProductRegistration("#110", "#112", "1.2", IconResourceID = 400)] // Info on this package for Help/About
     [ProvideAutoLoad(UIContextGuids80.NoSolution, PackageAutoLoadFlags.BackgroundLoad)]
     [ProvideAutoLoad(UIContextGuids80.SolutionExists, PackageAutoLoadFlags.BackgroundLoad)]
     [Guid(BimFormatterPackage.PackageGuidString)]
@@ -96,6 +96,10 @@ namespace BimFormatter
                 JsonSortArrayOptions.SortBy("model.perspectives.tables", "name"),
                 JsonSortArrayOptions.SortBy("model.perspectives.tables.columns", "name"),
                 JsonSortArrayOptions.SortBy("model.perspectives.tables.measures", "name"),
+
+                JsonSortArrayOptions.SortBy("model.roles", "name"),
+                JsonSortArrayOptions.SortBy("model.roles.tablePermissions", "name"),
+                JsonSortArrayOptions.SortBy("model.roles.tablePermissions.columnPermissions", "name"),
             });
         }
     }
