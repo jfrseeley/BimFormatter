@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -10,6 +11,8 @@ namespace BimFormatter.Text.Json
     {
         private readonly Dictionary<string, JsonSortArrayOptions> _sortArrayOptions;
         private readonly HashSet<string> _registeredPaths;
+
+        public Formatting Formatting { get; set; } = Formatting.Indented;
 
         public JsonFormatter(IEnumerable<JsonSortArrayOptions> sortArrayOptions)
         {
@@ -22,7 +25,7 @@ namespace BimFormatter.Text.Json
             var root = JsonConvert.DeserializeObject(text) as JObject;
             SortChildrenRecursive(root);
 
-            return JsonConvert.SerializeObject(root, Formatting.Indented);
+            return JsonConvert.SerializeObject(root, Formatting);
         }
 
         private void SortChildrenRecursive(JObject source)
@@ -49,11 +52,11 @@ namespace BimFormatter.Text.Json
                 }
 
                 var orderByPropertyName = sortArrayOptions.PropertyNames.First();
-                var ordered = children.OrderBy(jt => jt[orderByPropertyName]);
+                var ordered = children.OrderBy(jt => jt[orderByPropertyName].ToString(), StringComparer.OrdinalIgnoreCase);
 
                 foreach (var thenByPropertyName in sortArrayOptions.PropertyNames.Skip(1))
                 {
-                    ordered = ordered.ThenBy(jt => jt[thenByPropertyName]);
+                    ordered = ordered.ThenBy(jt => jt[thenByPropertyName].ToString(), StringComparer.OrdinalIgnoreCase);
                 }
 
                 foreach (var child in ordered)
